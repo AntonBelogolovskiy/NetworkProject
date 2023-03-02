@@ -172,18 +172,19 @@ public class TelnetSample {
 //            telnet.sendCommand("display clock\n");
 //            telnet.sendCommand("system-view\n");
 
-//            String currentConf = telnet.sendCommand("display current-configuration conf\n");
+            String currentConf = telnet.sendCommand("display current-configuration\n");
 //            telnet.sendCommand("display cur conf\n");
 
 //            String currentConf = telnet.sendCommand("display mac-address\n");
 
-            telnet.sendCommand("display cur\n");
-            telnet.sendCommand("display device\n");
-            telnet.sendCommand("display version\n");
+//            telnet.sendCommand("display cur\n");
+//            telnet.sendCommand("display device\n");
+//            telnet.sendCommand("display version\n");
 
 
 //             for view ESC sequences in String
-//            System.out.println(StringEscapeUtils.escapeJava(currentConf));
+            System.out.println(StringEscapeUtils.escapeJava(currentConf));
+            System.out.println(currentConf);
 
 
 //            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")) {
