@@ -63,38 +63,39 @@ public class TelnetSample {
 
 //            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[#>]$";
 //            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[>\\]].*";
-            final String prompt = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|[>\\]]$";
+            final String prompt = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|[>\\]]";
 
             Pattern pattern = Pattern.compile(prompt);
 //            Matcher matcher = pattern.matcher(tempString);
 
             int b;
-            while (!pattern.matcher(stringBuilder.toString()).find()) {
+            while (!pattern.matcher(stringBuilder.toString().trim()).find()) {
                 char[] charBuf = new char[2000];
                 int bufLength = reader.read(charBuf);
 
+
                 stringBuilder.append(charBuf, 0, bufLength);
-                tempString = stringBuilder.toString().trim();
+//                tempString = stringBuilder.toString().trim();
 //                System.out.print("***" + tempString + "***\n");
 
-                if (tempString.contains("---- More ----")) {
-                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cntrl}.{4}\\.*\\p{Cntrl}.{4}\\s*",
-                                                       "\r\n");
+                if (stringBuilder.toString().contains("---- More ----")) {
+//                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cntrl}.{4}\\.*\\p{Cntrl}.{4}\\s*",
+//                                                       "\r\n");
                     out.print(' ');
                     out.flush();
                 }
 
 //                matcher = pattern.matcher(tempString);
-
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        System.out.print(tempString.trim());
+        System.out.print(stringBuilder.toString().replaceAll("\\e",""));
 //        System.out.println("==========================================================");
 
-        return tempString.trim();
+        return stringBuilder.toString().replaceAll("\\e", "");
     }
 
     public String sendCommand(String command) {
