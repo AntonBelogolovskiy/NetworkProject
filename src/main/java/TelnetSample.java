@@ -1,4 +1,5 @@
 import org.apache.commons.net.telnet.*;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.*;
 import java.net.SocketException;
@@ -63,33 +64,26 @@ public class TelnetSample {
 //            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[#>]$";
 //            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[>\\]].*";
             final String prompt = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|[>\\]]";
-//            final String prompt = "Username:";
 
             Pattern pattern = Pattern.compile(prompt);
             Matcher matcher = pattern.matcher("");
 
             int b;
             while (!matcher.find()) {
-                char[] charBuf = new char[2000];
-
-//                b = reader.read();
+                char[] charBuf = new char[1024];
                 int bufLength = reader.read(charBuf);
 
-//                stringBuilder.append((char) b);
-                stringBuilder.append(charBuf,0,bufLength);
-
-
-
-//                tempString = stringBuilder.toString().replaceAll("[^\\p{Print}]", "");
+                stringBuilder.append(charBuf, 0, bufLength);
                 tempString = stringBuilder.toString();
 
                 if (tempString.contains("---- More ----")) {
+                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cc}\\S{1,4}\\s*\\p{Cc}\\S{1,4}",
+                                                       "\n");
                     out.print(' ');
                     out.flush();
                 }
 
                 matcher = pattern.matcher(tempString);
-//                System.out.print("***" + tempString + "\n");
 
             }
         } catch (Exception e) {
@@ -102,33 +96,8 @@ public class TelnetSample {
         return tempString;
     }
 
-    public String read2() throws InterruptedException {
-//        System.out.println("TelnetSample.read()");
-
-        StringBuffer sb = new StringBuffer();
-
-
-        try {
-            Thread.sleep(200);
-
-            int available = in.available();
-//            System.out.println("in.available=" + available);
-
-            for (int index = 0; index < available; index++) {
-                char ch = (char) in.read();
-                sb.append(ch);
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-
     public String sendCommand(String command) {
 
-//        if (Pattern.compile("quit|exit|logout").matcher(command.trim()).matches()) {
         if (command.trim().matches("quit|exit|logout")) {
             System.out.println("disconnecting...");
             try {
@@ -198,15 +167,15 @@ public class TelnetSample {
 //            telnet.sendCommand("en\n");
             telnet.sendCommand("undo terminal monitor\n");
 
-//            String output = telnet.sendCommand("display cur\n");
             telnet.sendCommand("display clock\n");
             telnet.sendCommand("system-view\n");
             String currentConf = telnet.sendCommand("display cur\n");
-//            currentConf=currentConf.replaceAll("\s*---- More ----\\p{Cc}.{4}\s*\\p{Cc}.{4}","");
+
+            // for view ESC sequences in String
+//            System.out.println(StringEscapeUtils.escapeJava(currentConf));
 
 
-
-            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")){
+            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")) {
                 fileWriter.print(currentConf);
             } catch (IOException e) {
                 throw new RuntimeException(e);
