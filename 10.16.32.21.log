@@ -1,0 +1,25 @@
+ÿûÿûÿûÿûÿýÿý
+********************************************************************************
+*  Copyright(c) 2004-2010 Hangzhou H3C Tech. Co., Ltd. All rights reserved.    *
+*  Without the owner's prior written consent,                                  *
+*  no decompiling or reverse-engineering shall be allowed.                     *
+********************************************************************************
+ÿüÿüÿúÿðÿþ
+
+Login authentication
+
+
+Username:mgrconf
+mgrconf
+Password: 12345
+
+<RyazanskiyProsp_d78.1_p3_niz>undo terminal monitor
+
+%Mar  1 21:50:24:903 2023 RyazanskiyProsp_d78.1_p3_niz SHELL/5/LOGIN:- 1 - mgrconf(10.254.247.20) in unit1 loginundo terminal monitor
+% Current terminal monitor is off
+
+<RyazanskiyProsp_d78.1_p3_niz>display clock
+display clock
+21:50:25 MSK Wed 03/01/2023
+Time Zone : MSK add 03:00:00
+<RyazanskiyProsp_d78.1_p3_niz>

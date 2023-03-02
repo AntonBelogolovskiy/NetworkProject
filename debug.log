@@ -1,0 +1,26 @@
+2023-03-01T21:28:20.0995236
+Connecting to 10.16.32.21
+
+********************************************************************************
+*  Copyright(c) 2004-2010 Hangzhou H3C Tech. Co., Ltd. All rights reserved.    *
+*  Without the owner's prior written consent,                                  *
+*  no decompiling or reverse-engineering shall be allowed.                     *
+********************************************************************************
+
+
+Login authentication
+
+
+Username:mgrconf
+Password: 
+<RyazanskiyProsp_d78.1_p3_niz>
+%Mar  1 21:28:19:601 2023 RyazanskiyProsp_d78.1_p3_niz SHELL/5/LOGIN:- 1 - mgrconf(10.254.247.20) in unit1 logindisplay clock
+21:28:19 MSK Wed 03/01/2023
+Time Zone : MSK add 03:00:00
+<RyazanskiyProsp_d78.1_p3_niz>disconnecting...
+
+%Mar  1 21:28:19:601 2023 RyazanskiyProsp_d78.1_p3_niz SHELL/5/LOGIN:- 1 - mgrconf(10.254.247.20) in unit1 logindisplay clock
+21:28:19 MSK Wed 03/01/2023
+Time Zone : MSK add 03:00:00
+<RyazanskiyProsp_d78.1_p3_niz>
+Program id ended..
