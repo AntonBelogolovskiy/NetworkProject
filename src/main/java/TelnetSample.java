@@ -202,9 +202,7 @@ public class TelnetSample {
             telnet.sendCommand("display clock\n");
             telnet.sendCommand("system-view\n");
             String currentConf = telnet.sendCommand("display cur\n");
-            currentConf=currentConf.replaceAll("\s*---- More ----\\p{Cc}.{4}\s*\\p{Cc}.{4}","");
-//            currentConf=currentConf.replaceAll("\s*---- More ----\\&([^;]{6})*","");
-//            currentConf=currentConf.replaceAll("\\p{Cntrl}","");
+//            currentConf=currentConf.replaceAll("\s*---- More ----\\p{Cc}.{4}\s*\\p{Cc}.{4}","");
 
 
 
