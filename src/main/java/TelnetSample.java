@@ -2,6 +2,8 @@ import org.apache.commons.net.telnet.*;
 
 import java.io.*;
 import java.net.SocketException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -52,26 +54,52 @@ public class TelnetSample {
 //        System.out.println("TelnetSample.readResponse()");
 //        Thread.sleep(500);
 
-        StringBuilder out = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
+        String tempString = "";
 
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[#>]$";
+//            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[#>]$";
+//            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[>\\]].*";
+            final String prompt = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|[>\\]]";
+//            final String prompt = "Username:";
+
+            Pattern pattern = Pattern.compile(prompt);
+            Matcher matcher = pattern.matcher("");
 
             int b;
-            while (!Pattern.compile(prompt).matcher(out.toString().replaceAll("[^\\p{Print}]", "")).matches()) {
-                b = reader.read();
-                out.append((char) b);
+            while (!matcher.find()) {
+                char[] charBuf = new char[2000];
+
+//                b = reader.read();
+                int bufLength = reader.read(charBuf);
+
+//                stringBuilder.append((char) b);
+                stringBuilder.append(charBuf,0,bufLength);
+
+
+
+//                tempString = stringBuilder.toString().replaceAll("[^\\p{Print}]", "");
+                tempString = stringBuilder.toString();
+
+                if (tempString.contains("---- More ----")) {
+                    out.print(' ');
+                    out.flush();
+                }
+
+                matcher = pattern.matcher(tempString);
+//                System.out.print("***" + tempString + "\n");
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        System.out.print(out.toString());
+        System.out.print(tempString);
 //        System.out.println("==========================================================");
 
-        return out.toString();
+        return tempString;
     }
 
     public String read2() throws InterruptedException {
@@ -153,6 +181,7 @@ public class TelnetSample {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
+        long startTime = System.currentTimeMillis();
         if (args.length != 0 && Objects.equals(args[0], "-d"))
             System.setOut(new PrintStream(new FileOutputStream("debug.log")));
         try {
@@ -169,7 +198,21 @@ public class TelnetSample {
 //            telnet.sendCommand("en\n");
             telnet.sendCommand("undo terminal monitor\n");
 
-            String output = telnet.sendCommand("display clock\n");
+//            String output = telnet.sendCommand("display cur\n");
+            telnet.sendCommand("display clock\n");
+            telnet.sendCommand("system-view\n");
+            String currentConf = telnet.sendCommand("display cur\n");
+            currentConf=currentConf.replaceAll("\s*---- More ----\\p{Cc}.{4}\s*\\p{Cc}.{4}","");
+//            currentConf=currentConf.replaceAll("\s*---- More ----\\&([^;]{6})*","");
+//            currentConf=currentConf.replaceAll("\\p{Cntrl}","");
+
+
+
+            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")){
+                fileWriter.print(currentConf);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
 
             telnet.sendCommand("quit\n");
@@ -181,7 +224,8 @@ public class TelnetSample {
 
             telnet.disconnect();
             System.out.println("Program id ended..");
-            System.out.println(output);
+            System.out.println(System.currentTimeMillis() - startTime);
+//            System.out.println(output);
 
         } catch (RuntimeException e) {
             System.out.println("Connection closed");
