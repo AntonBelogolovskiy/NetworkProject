@@ -23,7 +23,7 @@ public class TelnetSample {
         try {
             // Connect to the specified server
             telnet = new TelnetClient();
-            telnet.setConnectTimeout(2000);
+//            telnet.setConnectTimeout(20000);
             telnet.registerSpyStream(new FileOutputStream(server + ".log"));
             telnet.setReaderThread(true);
 
@@ -63,37 +63,38 @@ public class TelnetSample {
 
 //            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[#>]$";
 //            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[>\\]].*";
-            final String prompt = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|[>\\]]";
+            final String prompt = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|[>\\]]$";
 
             Pattern pattern = Pattern.compile(prompt);
-            Matcher matcher = pattern.matcher("");
+//            Matcher matcher = pattern.matcher(tempString);
 
             int b;
-            while (!matcher.find()) {
-                char[] charBuf = new char[1024];
+            while (!pattern.matcher(stringBuilder.toString()).find()) {
+                char[] charBuf = new char[2000];
                 int bufLength = reader.read(charBuf);
 
                 stringBuilder.append(charBuf, 0, bufLength);
-                tempString = stringBuilder.toString();
+                tempString = stringBuilder.toString().trim();
+//                System.out.print("***" + tempString + "***\n");
 
                 if (tempString.contains("---- More ----")) {
-                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cc}\\S{1,4}\\s*\\p{Cc}\\S{1,4}",
-                                                       "\n");
+                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cntrl}.{4}\\.*\\p{Cntrl}.{4}\\s*",
+                                                       "\r\n");
                     out.print(' ');
                     out.flush();
                 }
 
-                matcher = pattern.matcher(tempString);
+//                matcher = pattern.matcher(tempString);
 
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        System.out.print(tempString);
+        System.out.print(tempString.trim());
 //        System.out.println("==========================================================");
 
-        return tempString;
+        return tempString.trim();
     }
 
     public String sendCommand(String command) {
@@ -167,19 +168,28 @@ public class TelnetSample {
 //            telnet.sendCommand("en\n");
             telnet.sendCommand("undo terminal monitor\n");
 
-            telnet.sendCommand("display clock\n");
-            telnet.sendCommand("system-view\n");
-            String currentConf = telnet.sendCommand("display cur\n");
+//            telnet.sendCommand("display clock\n");
+//            telnet.sendCommand("system-view\n");
 
-            // for view ESC sequences in String
+//            String currentConf = telnet.sendCommand("display current-configuration conf\n");
+//            telnet.sendCommand("display cur conf\n");
+
+//            String currentConf = telnet.sendCommand("display mac-address\n");
+
+            telnet.sendCommand("display cur\n");
+            telnet.sendCommand("display device\n");
+            telnet.sendCommand("display version\n");
+
+
+//             for view ESC sequences in String
 //            System.out.println(StringEscapeUtils.escapeJava(currentConf));
 
 
-            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")) {
-                fileWriter.print(currentConf);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+//            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")) {
+//                fileWriter.print(currentConf);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
 
 
             telnet.sendCommand("quit\n");
