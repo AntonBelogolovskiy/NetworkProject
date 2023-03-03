@@ -1,3 +1,5 @@
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.telnet.*;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -76,7 +78,7 @@ public class TelnetSample {
 //            while (!pattern.matcher(stringBuilder.toString()).find()) {
             while (true) {
 
-                char[] charBuf = new char[5000];
+                char[] charBuf = new char[1024];
                 int bufLength = reader.read(charBuf);
 
                 tempString = String.valueOf(charBuf, 0, bufLength);
@@ -85,9 +87,10 @@ public class TelnetSample {
 //                tempString = stringBuilder.toString().trim();
                 System.out.print("$$s$$" + tempString + "$$e$$\n");
 
-                if (tempString.contains("---- More ----")) {
+                if (stringBuilder.toString().contains("---- More ----")) {
 //                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cntrl}.{4}.*\\p{Cntrl}.{4}",
 //                                                       "\r\n");
+                    String tmp = 
                     tempString = tempString.replaceAll("---- More ----\\e.{4}.*\\e",
                                                        "\r\n");
 
