@@ -62,7 +62,7 @@ public class TelnetSample {
 //        }
 
 
-        String tempString = "";
+        String tempString;
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
@@ -78,7 +78,9 @@ public class TelnetSample {
             int b;
             char[] charBuf = new char[1024];
 //            while (!pattern.matcher(stringBuilder.toString()).find()) {
-            while (true) {
+            //                    System.out.println("SB:" + stringBuilder + "...");
+            //                    System.out.println("Break");
+            do {
                 //stringBuilder.append(tempString);
 //                System.out.println(in.available());
 
@@ -91,27 +93,14 @@ public class TelnetSample {
                 if (stringBuilder.toString().contains("---- More ----")) {
 
                     tempString = stringBuilder.toString().replaceAll("\\s*---- More ----\\p{Cc}.*\\p{Cc}.{1,4}",
-                                                       "\r\n");
+                                                                     "\r\n");
 
                     stringBuilder = new StringBuilder(tempString);
 
                     out.print(' ');
                     out.flush();
 
-//                    try {
-//                        Thread.sleep(500);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-
                 }
-
-                if (pattern.matcher(stringBuilder.toString()).find() && in.available() == 0) {
-//                    System.out.println("SB:" + stringBuilder + "...");
-//                    System.out.println("Break");
-                    break;
-                }
-
 
 
 //                tempString = stringBuilder.toString().trim();
@@ -126,13 +115,13 @@ public class TelnetSample {
 //                    System.out.println("Break");
 //                    break;
 //                }
-            }
+            } while (!pattern.matcher(stringBuilder.toString()).find() || in.available() != 0);
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.print(stringBuilder.toString());
+        System.out.print(stringBuilder);
 //        System.out.println("==========================================================");
 
         return stringBuilder.toString();
