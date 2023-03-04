@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TelnetSample {
+    public static final String PROMPT = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|\\S[>\\]]";
     private TelnetClient telnet;
     private InputStream in;
     private PrintStream out;
@@ -35,16 +36,16 @@ public class TelnetSample {
             telnet.connect(server, port);
 
 
-//            TerminalTypeOptionHandler ttopt = new TerminalTypeOptionHandler("VT100", false, false, true, false);
-//            EchoOptionHandler echoopt = new EchoOptionHandler(true, false, true, false);
-//            SuppressGAOptionHandler gaopt = new SuppressGAOptionHandler(true, true, true, true);
-//            try {
-//                telnet.addOptionHandler(ttopt);
-//                telnet.addOptionHandler(echoopt);
-//                telnet.addOptionHandler(gaopt);
-//            } catch (InvalidTelnetOptionException e) {
-//                System.err.println("Error registering option handlers: " + e.getMessage());
-//            }
+            TerminalTypeOptionHandler ttopt = new TerminalTypeOptionHandler("VT100", false, false, true, false);
+            EchoOptionHandler echoopt = new EchoOptionHandler(true, false, true, false);
+            SuppressGAOptionHandler gaopt = new SuppressGAOptionHandler(true, true, true, true);
+            try {
+                telnet.addOptionHandler(ttopt);
+                telnet.addOptionHandler(echoopt);
+                telnet.addOptionHandler(gaopt);
+            } catch (InvalidTelnetOptionException e) {
+                System.err.println("Error registering option handlers: " + e.getMessage());
+            }
 
             in = telnet.getInputStream();
             out = new PrintStream(telnet.getOutputStream());
@@ -68,18 +69,9 @@ public class TelnetSample {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-//            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[#>]$";
-//            final String prompt = ".*[Ll]ogin:$|.*[Uu]sername:$|.*ssword:$|.*enable:$|.*[>\\]].*";
-            final String prompt = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|\\S[>\\]]";
+            Pattern pattern = Pattern.compile(PROMPT);
 
-            Pattern pattern = Pattern.compile(prompt);
-//            Matcher matcher = pattern.matcher(tempString);
-
-            int b;
             char[] charBuf = new char[1024];
-//            while (!pattern.matcher(stringBuilder.toString()).find()) {
-            //                    System.out.println("SB:" + stringBuilder + "...");
-            //                    System.out.println("Break");
             do {
                 //stringBuilder.append(tempString);
 //                System.out.println(in.available());
@@ -222,8 +214,11 @@ public class TelnetSample {
 //            telnet.sendCommand("display device\r\n");
 //            System.out.println(StringEscapeUtils.escapeJava(telnet.sendCommand("display version\r\n")));
 
+//            System.out.println(currentConf.substring(currentConf.indexOf("\n"),currentConf.lastIndexOf("\n")));
+            currentConf = currentConf.substring(currentConf.indexOf("\n")+1, currentConf.lastIndexOf("\n")-1);
+
             try (PrintWriter fileWriter = new PrintWriter("conf1.txt")) {
-                fileWriter.print(currentConf);
+                fileWriter.println(currentConf);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
