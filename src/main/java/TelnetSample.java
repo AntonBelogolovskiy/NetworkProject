@@ -79,32 +79,24 @@ public class TelnetSample {
             char[] charBuf = new char[1024];
 //            while (!pattern.matcher(stringBuilder.toString()).find()) {
             while (true) {
+                //stringBuilder.append(tempString);
+//                System.out.println(in.available());
+
                 int bufLength = reader.read(charBuf);
 
                 tempString = String.valueOf(charBuf, 0, bufLength);
-//                System.out.printf("###%s$$$",tempString);
                 stringBuilder.append(tempString);
-//                System.out.println(in.available());
-                if (pattern.matcher(stringBuilder.toString()).find() && in.available()==0) {
-//                    System.out.println("SB:" + stringBuilder + "...");
-//                    System.out.println("Break");
-                    break;
-                }
+//                System.out.printf("&&%s--", tempString);
 
+                if (stringBuilder.toString().contains("---- More ----")) {
 
-//                stringBuilder.append(tempString);
+                    tempString = stringBuilder.toString().replaceAll("\\s*---- More ----\\p{Cc}.*\\p{Cc}.{1,4}",
+                                                       "\r\n");
 
-//                if (tempString.contains("---- More ----")) {
-//                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cntrl}.{4}.*\\p{Cntrl}.{4}",
-//                                                       "\r\n");
+                    stringBuilder = new StringBuilder(tempString);
 
-//                    tempString = tempString.replaceAll("\\s*---- More ----\\p{Cc}.*\\p{Cc}.{4}",
-//                                                       "\r\n");
-
-//                    stringBuilder.append(tempString);
-
-//                    out.print(' ');
-//                    out.flush();
+                    out.print(' ');
+                    out.flush();
 
 //                    try {
 //                        Thread.sleep(500);
@@ -112,8 +104,15 @@ public class TelnetSample {
 //                        throw new RuntimeException(e);
 //                    }
 
-//                }
-//                else stringBuilder.append(tempString);
+                }
+
+                if (pattern.matcher(stringBuilder.toString()).find() && in.available() == 0) {
+//                    System.out.println("SB:" + stringBuilder + "...");
+//                    System.out.println("Break");
+                    break;
+                }
+
+
 
 //                tempString = stringBuilder.toString().trim();
 
@@ -158,7 +157,6 @@ public class TelnetSample {
             int ch;
 
             while ((ch = is.read()) != -1) {
-//                System.out.print((char) ch);
                 out.write(ch);
                 out.flush();
             }
@@ -218,7 +216,7 @@ public class TelnetSample {
 
 //            telnet.sendCommand("system-view\n");
 
-//            String currentConf = telnet.sendCommand("display current-configuration conf\r\n");
+            String currentConf = telnet.sendCommand("display current-configuration conf\r\n");
 //            telnet.sendCommand("display cur conf\n");
 
 //            String currentConf = telnet.sendCommand("display mac-address\n");
@@ -235,24 +233,18 @@ public class TelnetSample {
 //            telnet.sendCommand("display device\r\n");
 //            System.out.println(StringEscapeUtils.escapeJava(telnet.sendCommand("display version\r\n")));
 
-//            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")) {
-//                fileWriter.print(currentConf);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
+            try (PrintWriter fileWriter = new PrintWriter("conf1.txt")) {
+                fileWriter.print(currentConf);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
 
 //            telnet.sendCommand("quit\n");
 
-//            System.exit(222);
-            //telnet.sendCommand("mail from:xyz@testmail.com");
-            //telnet.sendCommand("rcpt to:pk@testmail.com");
-            //telnet.sendCommand("quit");
-
             telnet.disconnect();
             System.out.println("Program is ended..");
             System.out.println(System.currentTimeMillis() - startTime);
-//            System.out.println(output);
 
         } catch (RuntimeException e) {
             System.out.println("Connection closed");
