@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MyReader implements Runnable {
     private final BufferedReader reader;
-    private ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<String>();
+    private ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
     private boolean closed = false;
 
     public MyReader(BufferedReader reader) {
