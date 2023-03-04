@@ -1,19 +1,9 @@
-import org.apache.commons.lang3.RegExUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.telnet.*;
-import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.*;
-import java.net.SocketException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TelnetSample {
@@ -36,13 +26,13 @@ public class TelnetSample {
             telnet.connect(server, port);
 
 
-            TerminalTypeOptionHandler ttopt = new TerminalTypeOptionHandler("VT100", false, false, true, false);
-            EchoOptionHandler echoopt = new EchoOptionHandler(true, false, true, false);
-            SuppressGAOptionHandler gaopt = new SuppressGAOptionHandler(true, true, true, true);
+            TerminalTypeOptionHandler terminalTypeOpt = new TerminalTypeOptionHandler("VT100", false, false, true, false);
+            EchoOptionHandler echoOpt = new EchoOptionHandler(true, false, true, false);
+            SuppressGAOptionHandler gaOpt = new SuppressGAOptionHandler(true, true, true, true);
             try {
-                telnet.addOptionHandler(ttopt);
-                telnet.addOptionHandler(echoopt);
-                telnet.addOptionHandler(gaopt);
+                telnet.addOptionHandler(terminalTypeOpt);
+                telnet.addOptionHandler(echoOpt);
+                telnet.addOptionHandler(gaOpt);
             } catch (InvalidTelnetOptionException e) {
                 System.err.println("Error registering option handlers: " + e.getMessage());
             }
