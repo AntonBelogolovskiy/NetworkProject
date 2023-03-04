@@ -1,23 +1,33 @@
 import org.apache.commons.net.telnet.*;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class TelnetSample {
-    public static final String PROMPT = "[Ll]ogin:|[Uu]sername:|ssword:|enable:|\\S[>\\]]";
-    public static final int CONNECT_TIMEOUT = 5000;
+public class ClientTelnet {
+    private String prompt = "[Ll]ogin:.*\\z|[Uu]sername:.*\\z|ssword:.*\\z|enable:.*\\z|[>\\]]\\z";
+    private int connectTimeout = 5000;
     private TelnetClient telnet;
     private InputStream in;
     private PrintStream out;
 
-    public TelnetSample(String server, int port) {
+    public void setPrompt(String prompt) {
+        this.prompt = prompt;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public ClientTelnet(String server, int port) {
         try {
             // Connect to the specified server
             telnet = new TelnetClient();
-            telnet.setConnectTimeout(CONNECT_TIMEOUT);
+            telnet.setConnectTimeout(connectTimeout);
+
+//             for debug
             telnet.registerSpyStream(new FileOutputStream(server + ".log"));
 
 
@@ -26,10 +36,13 @@ public class TelnetSample {
             telnet.connect(server, port);
 
 
-            TerminalTypeOptionHandler terminalTypeOpt = new TerminalTypeOptionHandler("VT100", false, false, true,
+            TerminalTypeOptionHandler terminalTypeOpt = new TerminalTypeOptionHandler("VT100", false,
+                                                                                      false, true,
                                                                                       false);
-            EchoOptionHandler echoOpt = new EchoOptionHandler(true, false, true, false);
-            SuppressGAOptionHandler gaOpt = new SuppressGAOptionHandler(true, true, true, true);
+            EchoOptionHandler echoOpt = new EchoOptionHandler(true, false,
+                                                              true, false);
+            SuppressGAOptionHandler gaOpt = new SuppressGAOptionHandler(true, true,
+                                                                        true, true);
             try {
                 telnet.addOptionHandler(terminalTypeOpt);
                 telnet.addOptionHandler(echoOpt);
@@ -38,7 +51,7 @@ public class TelnetSample {
                 System.err.println("Error registering option handlers: " + e.getMessage());
             }
 
-            in = telnet.getInputStream();
+            in = new BufferedInputStream(telnet.getInputStream());
             out = new PrintStream(telnet.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,31 +64,46 @@ public class TelnetSample {
 
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            Pattern pattern = Pattern.compile(PROMPT);
+            Pattern pattern = Pattern.compile(prompt);
 
             char[] charBuf = new char[1024];
-            do {
+            while (true) {
+//                Thread.sleep(700);
+
+
                 int bufLength = reader.read(charBuf);
                 tempString = String.valueOf(charBuf, 0, bufLength);
                 stringBuilder.append(tempString);
                 if (stringBuilder.toString().contains("---- More ----")) {
-                    tempString = stringBuilder.toString().replaceAll("\\s*---- More ----\\p{Cc}.*\\p{Cc}.{1,4}",
-                                                                     "\n");
+//                    System.out.println("Before: &&&" + StringEscapeUtils.escapeJava((stringBuilder) + "***"));
+//                    Thread.sleep(1000);
+//                    tempString = stringBuilder.toString().replaceAll("\\s*---- More ----\\p{Cc}.*\\p{Cc}.{1,4}|" +
+//                                                                             "---- More ----.*\\z",
+//                                                                     "\n");
+                    tempString = stringBuilder.toString()
+                                              .replaceAll("\\s*---- More ----\\p{Cc}?", "\r\n")
+                                              .replaceAll("\u001b.*\u001b", "");
+
                     stringBuilder = new StringBuilder(tempString);
-                    out.print(' ');
+//                    Thread.sleep(2000);
+//                    System.out.println("After: &&&" + StringEscapeUtils.escapeJava((stringBuilder) + "***"));
+//                    System.exit(10);
+                    out.print(" ");
                     out.flush();
                 }
-            } while (!pattern.matcher(stringBuilder.toString()).find() || in.available() != 0);
+
+                if (pattern.matcher(stringBuilder.toString()).find() && in.available() == 0) break;
+//                if (in.available() == 0) break;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.print(stringBuilder);
-        return stringBuilder.toString();
+        System.out.print(stringBuilder.toString().trim());
+        return stringBuilder.toString().trim();
     }
 
     public String sendCommand(String command) {
-
         if (command.trim().matches("quit|exit|logout")) {
             System.out.println("disconnecting...");
             try {
@@ -86,18 +114,15 @@ public class TelnetSample {
             return null;
         }
         try {
-            InputStream is = new ByteArrayInputStream(command.getBytes());
-            int ch;
-            while ((ch = is.read()) != -1) {
-                out.write(ch);
-                out.flush();
-            }
+            out.print(command);
+            out.flush();
             return readResponse();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
+
     }
 
     public void disconnect() {
