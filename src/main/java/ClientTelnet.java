@@ -81,8 +81,8 @@ public class ClientTelnet {
 //                                                                             "---- More ----.*\\z",
 //                                                                     "\n");
                     tempString = stringBuilder.toString()
-                                              .replaceAll("\\s*---- More ----\\p{Cc}?", "\r\n")
-                                              .replaceAll("\u001b.*\u001b", "");
+                                              .replaceAll("\\s*---- More ----", "\r\n")
+                                              .replaceAll("\u001b.*\u001b.{4}", "");
 
                     stringBuilder = new StringBuilder(tempString);
 //                    Thread.sleep(2000);
@@ -99,8 +99,10 @@ public class ClientTelnet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.print(stringBuilder.toString().trim());
-        return stringBuilder.toString().trim();
+        String res = stringBuilder.toString().trim().replaceAll("\u001b.*\u001b.{4}", "");
+        System.out.print(res);
+
+        return res;
     }
 
     public String sendCommand(String command) {
