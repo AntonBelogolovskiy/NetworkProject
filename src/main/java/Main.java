@@ -4,13 +4,12 @@ import java.util.Objects;
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         if (args.length > 0 && Objects.equals(args[0], "-d"))
-
             System.setOut(new PrintStream(new FileOutputStream("debug.log")));
         try {
 
 //            String server = "10.16.32.21";
-            String server = "10.16.32.251";
-//            String server = "10.16.32.10";
+//            String server = "10.16.32.251";
+            String server = "10.16.32.10";
             int port = 23;
 
             ClientTelnet telnet = new ClientTelnet(server, port);
