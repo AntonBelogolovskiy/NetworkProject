@@ -1,7 +1,6 @@
-package ru.hector;
+package ru.networking;
 
 import org.apache.commons.net.telnet.*;
-import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.*;
 import java.time.LocalDateTime;

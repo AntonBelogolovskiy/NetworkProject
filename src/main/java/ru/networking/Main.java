@@ -1,4 +1,4 @@
-package ru.hector;
+package ru.networking;
 
 import java.io.*;
 import java.util.Objects;

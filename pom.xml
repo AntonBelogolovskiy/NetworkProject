@@ -30,10 +30,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ru.hector.Main</mainClass>
+                            <mainClass>ru.networking.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -59,7 +60,7 @@
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>ru.hector.Main</mainClass>
+                            <mainClass>ru.networking.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
