@@ -28,8 +28,24 @@ public class ClientTelnet implements Runnable{
     public ClientTelnet(String server, int port) {
         this.server = server;
         this.port = port;
-        this.telnet = new TelnetClient();
-        System.out.println(telnet);
+        telnet = new TelnetClient();
+
+        TerminalTypeOptionHandler terminalTypeOpt = new TerminalTypeOptionHandler("VT100", false,
+                                                                                  false, true,
+                                                                                  false);
+        EchoOptionHandler echoOpt = new EchoOptionHandler(false, false,
+                                                          false, false);
+        SuppressGAOptionHandler gaOpt = new SuppressGAOptionHandler(true, true,
+                                                                    true, true);
+        try {
+            telnet.addOptionHandler(terminalTypeOpt);
+            telnet.addOptionHandler(echoOpt);
+            telnet.addOptionHandler(gaOpt);
+        } catch (InvalidTelnetOptionException | IOException e) {
+            System.err.println("Error registering option handlers: " + e.getMessage());
+        }
+//        telnet.setReaderThread(true);
+//        System.out.println(telnet);
     }
 
     public void connect() {
@@ -39,7 +55,7 @@ public class ClientTelnet implements Runnable{
             telnet.setConnectTimeout(connectTimeout);
 
 //             for debug
-            telnet.registerSpyStream(new FileOutputStream(server + ".log"));
+//            telnet.registerSpyStream(new FileOutputStream(server + ".log"));
 
 
             System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
@@ -47,20 +63,7 @@ public class ClientTelnet implements Runnable{
             telnet.connect(server, port);
 
 
-            TerminalTypeOptionHandler terminalTypeOpt = new TerminalTypeOptionHandler("VT100", false,
-                                                                                      false, true,
-                                                                                      false);
-            EchoOptionHandler echoOpt = new EchoOptionHandler(true, false,
-                                                              true, false);
-            SuppressGAOptionHandler gaOpt = new SuppressGAOptionHandler(true, true,
-                                                                        true, true);
-            try {
-                telnet.addOptionHandler(terminalTypeOpt);
-                telnet.addOptionHandler(echoOpt);
-                telnet.addOptionHandler(gaOpt);
-            } catch (InvalidTelnetOptionException e) {
-                System.err.println("Error registering option handlers: " + e.getMessage());
-            }
+
 
             this.in = new BufferedInputStream(telnet.getInputStream());
             this.out = new PrintStream(telnet.getOutputStream());
