@@ -7,12 +7,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
-public class ClientTelnet {
+public class ClientTelnet implements Runnable{
     private String prompt = "[Ll]ogin:.*\\z|[Uu]sername:.*\\z|ssword:.*\\z|enable:.*\\z|[>\\]]\\z";
     private int connectTimeout = 5000;
+    private String server;
+    private int port;
     private TelnetClient telnet;
     private InputStream in;
     private PrintStream out;
+
 
     public void setPrompt(String prompt) {
         this.prompt = prompt;
@@ -23,9 +26,16 @@ public class ClientTelnet {
     }
 
     public ClientTelnet(String server, int port) {
+        this.server = server;
+        this.port = port;
+        this.telnet = new TelnetClient();
+        System.out.println(telnet);
+    }
+
+    public void connect() {
         try {
             // Connect to the specified server
-            telnet = new TelnetClient();
+
             telnet.setConnectTimeout(connectTimeout);
 
 //             for debug
@@ -52,8 +62,8 @@ public class ClientTelnet {
                 System.err.println("Error registering option handlers: " + e.getMessage());
             }
 
-            in = new BufferedInputStream(telnet.getInputStream());
-            out = new PrintStream(telnet.getOutputStream());
+            this.in = new BufferedInputStream(telnet.getInputStream());
+            this.out = new PrintStream(telnet.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -126,12 +136,35 @@ public class ClientTelnet {
         return null;
 
     }
-
     public void disconnect() {
         try {
             telnet.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            connect();
+            readResponse();
+            sendCommand("mgrconf\n");
+            sendCommand("12345\n");
+            sendCommand("display clock\n");
+            sendCommand("screen-length 0 temporary\n");
+            String currentConf = sendCommand("display current-configuration\n");
+            currentConf = currentConf.substring(currentConf.indexOf("\n") + 1, currentConf.lastIndexOf("\n") - 1);
+
+            try (PrintWriter fileWriter = new PrintWriter(server + ".conf")) {
+                fileWriter.println(currentConf);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            disconnect();
+        } catch (RuntimeException e){
+            System.out.println("Connection closed");
         }
     }
 }
