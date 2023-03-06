@@ -1,3 +1,5 @@
+package ru.hector;
+
 import org.apache.commons.net.telnet.*;
 import org.apache.commons.text.StringEscapeUtils;
 

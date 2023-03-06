@@ -1,3 +1,5 @@
+package ru.hector;
+
 import java.io.*;
 import java.util.Objects;
 
