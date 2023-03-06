@@ -28,8 +28,10 @@ public class ClientTelnet implements Runnable{
     public ClientTelnet(String server, int port) {
         this.server = server;
         this.port = port;
-        telnet = new TelnetClient();
+        this.telnet = new TelnetClient();
+        this.telnet.setReaderThread(true);
 
+        //-------------
         TerminalTypeOptionHandler terminalTypeOpt = new TerminalTypeOptionHandler("VT100", false,
                                                                                   false, true,
                                                                                   false);
@@ -38,14 +40,13 @@ public class ClientTelnet implements Runnable{
         SuppressGAOptionHandler gaOpt = new SuppressGAOptionHandler(true, true,
                                                                     true, true);
         try {
-            telnet.addOptionHandler(terminalTypeOpt);
-            telnet.addOptionHandler(echoOpt);
-            telnet.addOptionHandler(gaOpt);
+            this.telnet.addOptionHandler(terminalTypeOpt);
+            this.telnet.addOptionHandler(echoOpt);
+            this.telnet.addOptionHandler(gaOpt);
         } catch (InvalidTelnetOptionException | IOException e) {
             System.err.println("Error registering option handlers: " + e.getMessage());
         }
-//        telnet.setReaderThread(true);
-//        System.out.println(telnet);
+        //-------------
     }
 
     public void connect() {
@@ -77,12 +78,13 @@ public class ClientTelnet implements Runnable{
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
+            Thread.sleep(50);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             Pattern pattern = Pattern.compile(prompt);
 
             char[] charBuf = new char[1024];
             while (true) {
-//                Thread.sleep(700);
+                Thread.sleep(50);
 
 
                 int bufLength = reader.read(charBuf);
