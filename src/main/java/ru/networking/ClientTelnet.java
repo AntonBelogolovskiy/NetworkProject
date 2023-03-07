@@ -78,7 +78,7 @@ public class ClientTelnet implements Runnable{
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
-            Thread.sleep(50);
+            Thread.sleep(100);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             Pattern pattern = Pattern.compile(prompt);
 
