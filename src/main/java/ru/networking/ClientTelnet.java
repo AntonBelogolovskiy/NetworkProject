@@ -7,24 +7,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
-public class ClientTelnet implements Runnable{
-    private String prompt = "[Ll]ogin:.*\\z|[Uu]sername:.*\\z|ssword:.*\\z|enable:.*\\z|[>\\]]\\z|login\\z";
+public class ClientTelnet implements Runnable {
+    private String prompt = "[Ll]ogin:.*\\z|[Uu]sername:.*\\z|ssword:.*\\z|enable:.*\\z|[>\\]]\\z|in unit\\d login\\z";
     private int connectTimeout = 5000;
     private String server;
     private int port;
     private TelnetClient telnet;
     private InputStream in;
     private PrintStream out;
-
-
     public void setPrompt(String prompt) {
         this.prompt = prompt;
     }
-
     public void setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
-
     public ClientTelnet(String server, int port) {
         this.server = server;
         this.port = port;
@@ -48,37 +44,29 @@ public class ClientTelnet implements Runnable{
         }
         //-------------
     }
-
     public void connect() {
         try {
             // Connect to the specified server
-
             telnet.setConnectTimeout(connectTimeout);
 
 //             for debug
 //            telnet.registerSpyStream(new FileOutputStream(server + ".log"));
 
-
             System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             System.out.println("Connecting to " + server);
             telnet.connect(server, port);
-
-
-
-
             this.in = new BufferedInputStream(telnet.getInputStream());
             this.out = new PrintStream(telnet.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
     public String readResponse() {
         String tempString;
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
-            Thread.sleep(500);
+//            Thread.sleep(500);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             Pattern pattern = Pattern.compile(prompt);
 
@@ -86,29 +74,17 @@ public class ClientTelnet implements Runnable{
             while (true) {
                 Thread.sleep(50);
 
-
                 int bufLength = reader.read(charBuf);
                 tempString = String.valueOf(charBuf, 0, bufLength);
                 stringBuilder.append(tempString);
                 if (stringBuilder.toString().contains("---- More ----")) {
-//                    System.out.println("Before: &&&" + StringEscapeUtils.escapeJava((stringBuilder) + "***"));
-//                    Thread.sleep(1000);
-//                    tempString = stringBuilder.toString().replaceAll("\\s*---- More ----\\p{Cc}.*\\p{Cc}.{1,4}|" +
-//                                                                             "---- More ----.*\\z",
-//                                                                     "\n");
-                    tempString = stringBuilder.toString()
-                                              .replaceAll("\\s*---- More ----", "\r\n");
-
+                    tempString = stringBuilder.toString().replaceAll("\\s*---- More ----", "\r\n");
                     stringBuilder = new StringBuilder(tempString);
-//                    Thread.sleep(2000);
-//                    System.out.println("After: &&&" + StringEscapeUtils.escapeJava((stringBuilder) + "***"));
-//                    System.exit(10);
                     out.print(" ");
                     out.flush();
                 }
 
                 if (pattern.matcher(stringBuilder.toString()).find() && in.available() == 0) break;
-//                if (in.available() == 0) break;
             }
 
         } catch (Exception e) {
@@ -141,6 +117,7 @@ public class ClientTelnet implements Runnable{
         return null;
 
     }
+
     public void disconnect() {
         try {
             telnet.disconnect();
@@ -169,7 +146,7 @@ public class ClientTelnet implements Runnable{
             }
 
             disconnect();
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             System.out.println("Connection closed");
         }
     }
