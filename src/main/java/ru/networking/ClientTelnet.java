@@ -84,7 +84,7 @@ public class ClientTelnet implements Runnable{
 
             char[] charBuf = new char[1024];
             while (true) {
-                Thread.sleep(100);
+                Thread.sleep(50);
 
 
                 int bufLength = reader.read(charBuf);
