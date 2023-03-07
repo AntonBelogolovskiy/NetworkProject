@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 public class ClientTelnet implements Runnable{
-    private String prompt = "[Ll]ogin:.*\\z|[Uu]sername:.*\\z|ssword:.*\\z|enable:.*\\z|[>\\]]\\z";
+    private String prompt = "[Ll]ogin:.*\\z|[Uu]sername:.*\\z|ssword:.*\\z|enable:.*\\z|[>\\]]\\z|login\\z";
     private int connectTimeout = 5000;
     private String server;
     private int port;
@@ -78,13 +78,13 @@ public class ClientTelnet implements Runnable{
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
-            Thread.sleep(100);
+            Thread.sleep(500);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             Pattern pattern = Pattern.compile(prompt);
 
             char[] charBuf = new char[1024];
             while (true) {
-                Thread.sleep(50);
+                Thread.sleep(100);
 
 
                 int bufLength = reader.read(charBuf);
@@ -156,6 +156,7 @@ public class ClientTelnet implements Runnable{
             readResponse();
             sendCommand("mgrconf\n");
             sendCommand("12345\n");
+            sendCommand("undo terminal monitor\n");
             sendCommand("display clock\n");
             sendCommand("screen-length 0 temporary\n");
             String currentConf = sendCommand("display current-configuration\n");

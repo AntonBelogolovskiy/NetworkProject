@@ -18,13 +18,12 @@ public class Main {
 //            thread1.start();
 
 //            ClientTelnet telnet = new ClientTelnet(server, port);
-            Thread thread1 = new Thread(new ClientTelnet("10.16.32.10",port));
-            Thread thread2 = new Thread(new ClientTelnet("10.16.32.21",port));
-            Thread thread3 = new Thread(new ClientTelnet("83.167.99.65",port));
-
-            thread1.start();
-            thread2.start();
-            thread3.start();
+            new Thread(new ClientTelnet("10.16.32.10",port)).start();
+            new Thread(new ClientTelnet("10.16.32.21",port)).start();
+            new Thread(new ClientTelnet("83.167.99.65",port)).start();
+            new Thread(new ClientTelnet("10.16.33.206",port)).start();
+            new Thread(new ClientTelnet("10.16.33.217",port)).start();
+            new Thread(new ClientTelnet("10.16.34.185",port)).start();
 
 //            telnet.readResponse();
 //
