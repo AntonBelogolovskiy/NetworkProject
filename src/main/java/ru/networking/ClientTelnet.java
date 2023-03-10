@@ -15,17 +15,19 @@ public class ClientTelnet implements Runnable {
     private TelnetClient telnet;
     private InputStream in;
     private PrintStream out;
+
     public void setPrompt(String prompt) {
         this.prompt = prompt;
     }
     public void setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
+
     public ClientTelnet(String server, int port) {
         this.server = server;
         this.port = port;
-        this.telnet = new TelnetClient();
-        this.telnet.setReaderThread(true);
+        telnet = new TelnetClient();
+        telnet.setReaderThread(true);
 
         //-------------
         TerminalTypeOptionHandler terminalTypeOpt = new TerminalTypeOptionHandler("VT100", false,
@@ -36,9 +38,9 @@ public class ClientTelnet implements Runnable {
         SuppressGAOptionHandler gaOpt = new SuppressGAOptionHandler(true, true,
                                                                     true, true);
         try {
-            this.telnet.addOptionHandler(terminalTypeOpt);
-            this.telnet.addOptionHandler(echoOpt);
-            this.telnet.addOptionHandler(gaOpt);
+            telnet.addOptionHandler(terminalTypeOpt);
+            telnet.addOptionHandler(echoOpt);
+            telnet.addOptionHandler(gaOpt);
         } catch (InvalidTelnetOptionException | IOException e) {
             System.err.println("Error registering option handlers: " + e.getMessage());
         }
@@ -52,11 +54,12 @@ public class ClientTelnet implements Runnable {
 //             for debug
 //            telnet.registerSpyStream(new FileOutputStream(server + ".log"));
 
-            System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            System.out.println("Connecting to " + server);
+//            System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+//            System.out.println("Connecting to " + server);
+
             telnet.connect(server, port);
-            this.in = new BufferedInputStream(telnet.getInputStream());
-            this.out = new PrintStream(telnet.getOutputStream());
+            in = new BufferedInputStream(telnet.getInputStream());
+            out = new PrintStream(telnet.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,13 +69,13 @@ public class ClientTelnet implements Runnable {
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
-//            Thread.sleep(500);
+            Thread.sleep(200);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             Pattern pattern = Pattern.compile(prompt);
 
             char[] charBuf = new char[1024];
             while (true) {
-                Thread.sleep(50);
+                Thread.sleep(100);
 
                 int bufLength = reader.read(charBuf);
                 tempString = String.valueOf(charBuf, 0, bufLength);
@@ -91,7 +94,7 @@ public class ClientTelnet implements Runnable {
             e.printStackTrace();
         }
         String res = stringBuilder.toString().replaceAll("\u001b.*\u001b.{1,4}", "");
-        System.out.print(res);
+        //System.out.print(res);
 
         return res;
     }
