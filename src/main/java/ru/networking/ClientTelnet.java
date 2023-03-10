@@ -15,17 +15,20 @@ public class ClientTelnet implements Runnable {
     private TelnetClient telnet;
     private InputStream in;
     private PrintStream out;
+    private final String[] commands;
 
     public void setPrompt(String prompt) {
         this.prompt = prompt;
     }
+
     public void setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
 
-    public ClientTelnet(String server, int port) {
+    public ClientTelnet(String server, int port, String... commands) {
         this.server = server;
         this.port = port;
+        this.commands = commands;
         telnet = new TelnetClient();
         telnet.setReaderThread(true);
 
@@ -46,6 +49,7 @@ public class ClientTelnet implements Runnable {
         }
         //-------------
     }
+
     public void connect() {
         try {
             // Connect to the specified server
@@ -64,6 +68,7 @@ public class ClientTelnet implements Runnable {
             e.printStackTrace();
         }
     }
+
     public String readResponse() {
         String tempString;
         StringBuilder stringBuilder = new StringBuilder();
@@ -94,7 +99,7 @@ public class ClientTelnet implements Runnable {
             e.printStackTrace();
         }
         String res = stringBuilder.toString().replaceAll("\u001b.*\u001b.{1,4}", "");
-        //System.out.print(res);
+        System.out.print(res);
 
         return res;
     }
@@ -140,7 +145,8 @@ public class ClientTelnet implements Runnable {
             sendCommand("display clock\n");
             sendCommand("screen-length 0 temporary\n");
             String currentConf = sendCommand("display current-configuration\n");
-            currentConf = currentConf.substring(currentConf.indexOf("\n") + 1, currentConf.lastIndexOf("\n") - 1);
+            currentConf = currentConf.substring(currentConf.indexOf("\n") + 1,
+                                                currentConf.lastIndexOf("\n") - 1);
 
             try (PrintWriter fileWriter = new PrintWriter(server + ".conf")) {
                 fileWriter.println(currentConf);
