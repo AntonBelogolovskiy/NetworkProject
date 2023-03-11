@@ -22,7 +22,7 @@ public class Main {
 
             ClientTelnet client1 = new ClientTelnet("10.16.32.10",23,prompt);
             client1.setCommands(commands);
-            new Thread(client1).start();
+            client1.start();
 
 //            new Thread(new ClientTelnet("10.16.32.10", port, prompt)).start();
 //            new Thread(new ClientTelnet("10.16.32.21", port, prompt)).start();

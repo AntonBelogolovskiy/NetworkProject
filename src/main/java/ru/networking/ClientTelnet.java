@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
-public class ClientTelnet implements Runnable {
+public class ClientTelnet extends Thread {
     private String prompt;
     private int connectTimeout = 5000;
     private String server;
