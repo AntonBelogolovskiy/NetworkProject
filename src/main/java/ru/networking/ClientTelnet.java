@@ -144,9 +144,9 @@ public class ClientTelnet extends Thread {
     @Override
     public void run() {
 //        try {
-            connect();
-            executeCommands();
-            disconnect();
+        connect();
+        executeCommands();
+        disconnect();
 //            readResponse();
 //            sendCommand("mgrconf\n");
 //            sendCommand("12345\n");
