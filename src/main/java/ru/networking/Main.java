@@ -1,7 +1,12 @@
 package ru.networking;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
@@ -61,13 +66,35 @@ public class Main {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-
-                for (int i=0;i<4;i++) {
-                    client3.sendCommand("show mac-address-table address 44:6a:2e:fa:dc:67\n\n");
-                }
-
-                client3.disconnect();
             }
+
+            String getMacAddress = "show mac-address-table address 44:6a:2e:fa:dc:67\n";
+            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+//            try (FileWriter fileWriter = new FileWriter("10.16.61.221_mac_find.log",true)) {
+            FileWriter fileWriter = new FileWriter("10.16.61.221_mac_find.log");
+            scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    String macAddress = client3.sendCommand(getMacAddress);
+                    try {
+                        fileWriter.write(LocalDateTime.now().toString() + "\n");
+                        macAddress = macAddress.substring(macAddress.indexOf("\n") + 1,
+                                                          macAddress.lastIndexOf("\n") - 1);
+
+                        fileWriter.write(macAddress + "\n");
+                        fileWriter.flush();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+//                                               substring(getMacAddress.indexOf("\n") + 1,
+//                                                         getMacAddress.lastIndexOf("\n") - 1);
+                    System.out.println("---" + macAddress + "---");
+                }
+            }, 0, 2, TimeUnit.SECONDS);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+
 
 //            new Thread(new ClientTelnet("10.16.32.10", port, promptHuawei)).start();
 //            new Thread(new ClientTelnet("10.16.32.21", port, promptHuawei)).start();
@@ -81,6 +108,8 @@ public class Main {
         } catch (RuntimeException e) {
             e.printStackTrace();
             System.out.println("Connection closed");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
