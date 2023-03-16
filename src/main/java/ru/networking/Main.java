@@ -46,7 +46,8 @@ public class Main {
                     "mgrconf\n",
                     "12345\n",
                     "terminal length 0\n",
-                    "show mac-address-table address 44:6a:2e:fa:dc:67\n"});
+            });
+
             client3.start();
 
 //            try {
@@ -61,7 +62,10 @@ public class Main {
                     throw new RuntimeException(e);
                 }
 
-                client3.sendCommand("show clock\n");
+                for (int i=0;i<4;i++) {
+                    client3.sendCommand("show mac-address-table address 44:6a:2e:fa:dc:67\n\n");
+                }
+
                 client3.disconnect();
             }
 

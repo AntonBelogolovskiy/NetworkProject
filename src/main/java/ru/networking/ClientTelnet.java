@@ -172,16 +172,10 @@ public class ClientTelnet extends Thread {
     }
 
     synchronized private void executeCommands() {
-        notifyAll();
         readResponse();
         for (String command : commands) {
             sendCommand(command);
         }
-//        try {
-//            sleep(1000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-
+        notifyAll();
     }
 }
