@@ -3,8 +3,6 @@ package ru.networking;
 import org.apache.commons.net.telnet.*;
 
 import java.io.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 public class ClientTelnet extends Thread {
@@ -56,13 +54,13 @@ public class ClientTelnet extends Thread {
         //-------------
     }
 
-    public void connect() {
+    synchronized public void connect() {
         try {
             // Connect to the specified server
             telnet.setConnectTimeout(connectTimeout);
 
 //             for debug
-//            telnet.registerSpyStream(new FileOutputStream(server + ".log"));
+            telnet.registerSpyStream(new FileOutputStream(server + ".log"));
 
 //            System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 //            System.out.println("Connecting to " + server);
@@ -111,16 +109,18 @@ public class ClientTelnet extends Thread {
     }
 
     public String sendCommand(String command) {
+
         if (command.trim().matches("quit|exit|logout")) {
             System.out.println("disconnecting...");
             disconnect();
-//            try {
-//                telnet.disconnect();
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
+            //            try {
+            //                telnet.disconnect();
+            //            } catch (IOException e) {
+            //                throw new RuntimeException(e);
+            //            }
             return null;
         }
+
         try {
             out.print(command);
             out.flush();
@@ -128,14 +128,13 @@ public class ClientTelnet extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
-
     }
 
     public void disconnect() {
         try {
             telnet.disconnect();
+            this.interrupt();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,7 +145,10 @@ public class ClientTelnet extends Thread {
 //        try {
         connect();
         executeCommands();
-        disconnect();
+//        disconnect();
+
+        while (!isInterrupted()) {
+        }
 //            readResponse();
 //            sendCommand("mgrconf\n");
 //            sendCommand("12345\n");
@@ -169,10 +171,17 @@ public class ClientTelnet extends Thread {
 //        }
     }
 
-    private void executeCommands() {
+    synchronized private void executeCommands() {
+        notifyAll();
         readResponse();
         for (String command : commands) {
             sendCommand(command);
         }
+//        try {
+//            sleep(1000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
     }
 }

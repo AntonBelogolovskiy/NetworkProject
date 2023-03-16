@@ -33,13 +33,37 @@ public class Main {
                     "show running-config\n"
             };
 
-            ClientTelnet client1 = new ClientTelnet("10.16.32.21",23,promptHuawei); //H3C S3100-26
-            ClientTelnet client2 = new ClientTelnet("10.16.0.3",23,promptRaisecom); //H3C S3100-26
+//            ClientTelnet client1 = new ClientTelnet("10.16.32.21", 23, promptHuawei); //H3C S3100-26
+//            ClientTelnet client2 = new ClientTelnet("10.16.0.3", 23, promptRaisecom); //Raisecom
+//
+//            client1.setCommands(commandsHuawei);
+////            client1.start();
+//            client2.setCommands(commandsRaisecom);
+//            client2.start();
 
-            client1.setCommands(commandsHuawei);
-//            client1.start();
-            client2.setCommands(commandsRaisecom);
-            client2.start();
+            ClientTelnet client3 = new ClientTelnet("10.16.61.221", 23, promptRaisecom); //DCN
+            client3.setCommands(new String[]{
+                    "mgrconf\n",
+                    "12345\n",
+                    "terminal length 0\n",
+                    "show mac-address-table address 44:6a:2e:fa:dc:67\n"});
+            client3.start();
+
+//            try {
+//                Thread.sleep(2000);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+            synchronized (client3) {
+                try {
+                    client3.wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                client3.sendCommand("show clock\n");
+                client3.disconnect();
+            }
 
 //            new Thread(new ClientTelnet("10.16.32.10", port, promptHuawei)).start();
 //            new Thread(new ClientTelnet("10.16.32.21", port, promptHuawei)).start();
@@ -51,6 +75,7 @@ public class Main {
             System.out.println("Program is ended..");
 
         } catch (RuntimeException e) {
+            e.printStackTrace();
             System.out.println("Connection closed");
         }
     }
