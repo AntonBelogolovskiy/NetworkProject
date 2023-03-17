@@ -87,7 +87,7 @@ public class Main {
                     throw new RuntimeException(e);
                 }
                 //System.out.println("---" + macAddress + "---");
-            }, 0, 3, TimeUnit.SECONDS);
+            }, 0, 3, TimeUnit.MINUTES);
 
 
 
