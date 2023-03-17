@@ -26,7 +26,6 @@
     </dependencies>
 
     <build>
-<!--        <sourceDirectory>src/main/java/ru/hector</sourceDirectory>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

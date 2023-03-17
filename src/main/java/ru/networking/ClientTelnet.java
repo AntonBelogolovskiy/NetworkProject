@@ -147,7 +147,14 @@ public class ClientTelnet extends Thread {
         executeCommands();
 //        disconnect();
 
-        while (!isInterrupted()) {
+        synchronized (this) {
+            while (!isInterrupted()) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 //            readResponse();
 //            sendCommand("mgrconf\n");
