@@ -75,21 +75,28 @@ public class Main {
             FileWriter fileWriter = new FileWriter("10.16.61.221_mac_find.log");
 
             scheduledExecutorService.scheduleWithFixedDelay(() -> {
-                String macAddress = client3.sendCommand(getMacAddress);
                 try {
-                    fileWriter.write(LocalDateTime.now() + "\n");
-                    macAddress = macAddress.substring(macAddress.indexOf("\n") + 1,
-                                                      macAddress.lastIndexOf("\n") - 1);
+                    String macAddress = client3.sendCommand(getMacAddress);
+                    try {
+                        fileWriter.write(LocalDateTime.now() + "\n");
+                        macAddress = macAddress.substring(macAddress.indexOf("\n") + 1,
+                                                          macAddress.lastIndexOf("\n") - 1);
 
-                    fileWriter.write(macAddress + "\n");
-                    fileWriter.flush();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                        fileWriter.write(macAddress + "\n");
+                        fileWriter.flush();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Что-то пошло не так..");
+                    client3.disconnect();
+                    scheduledExecutorService.shutdownNow();
+                    e.printStackTrace();
                 }
                 //System.out.println("---" + macAddress + "---");
             }, 0, 3, TimeUnit.MINUTES);
 
-
+//            client3.disconnect();
 
 //            new Thread(new ClientTelnet("10.16.32.10", port, promptHuawei)).start();
 //            new Thread(new ClientTelnet("10.16.32.21", port, promptHuawei)).start();

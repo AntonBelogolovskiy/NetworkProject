@@ -125,10 +125,10 @@ public class ClientTelnet extends Thread {
             out.print(command);
             out.flush();
             return readResponse();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
+            throw new NullPointerException();
         }
-        return null;
+//        return null;
     }
 
     public void disconnect() {
@@ -152,7 +152,7 @@ public class ClientTelnet extends Thread {
                 try {
                     wait();
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    disconnect();
                 }
             }
         }
