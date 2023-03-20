@@ -46,7 +46,7 @@ public class Main {
 //            client2.setCommands(commandsRaisecom);
 //            client2.start();
 
-            ClientTelnet client3 = new ClientTelnet("10.16.61.221", 23, promptRaisecom); //DCN
+            ClientTelnet client3 = new ClientTelnet("10.16.62.217", 23, promptRaisecom); //DCN
             client3.setCommands(new String[]{
                     "mgrconf\n",
                     "12345\n",
@@ -70,9 +70,9 @@ public class Main {
 
 
 
-            String getMacAddress = "show mac-address-table address 44:6a:2e:fa:dc:67\n";
+            String getMacAddress = "show mac-address-table address 44-6a-2e-fa-dc-67\n";
             ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            FileWriter fileWriter = new FileWriter("10.16.61.221_mac_find.log");
+            FileWriter fileWriter = new FileWriter("10.16.62.217_mac_find.log");
 
             scheduledExecutorService.scheduleWithFixedDelay(() -> {
                 try {
