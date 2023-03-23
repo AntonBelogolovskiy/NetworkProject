@@ -64,25 +64,26 @@ public class Main {
                 try {
                     client3.wait();
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    Thread.currentThread().interrupt();
                 }
             }
 
 
 
-            String getMacAddress = "show mac-address-table address 44-6a-2e-fa-dc-67\n";
+            String getMacAddress = String.format("show mac-address-table address 44-6a-2e-fa-dc-67%n");
             ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+
             FileWriter fileWriter = new FileWriter("10.16.62.217_mac_find.log");
 
             scheduledExecutorService.scheduleWithFixedDelay(() -> {
                 try {
                     String macAddress = client3.sendCommand(getMacAddress);
                     try {
-                        fileWriter.write(LocalDateTime.now() + "\n");
+                        fileWriter.write(String.format("%s%n",LocalDateTime.now()));
                         macAddress = macAddress.substring(macAddress.indexOf("\n") + 1,
                                                           macAddress.lastIndexOf("\n") - 1);
 
-                        fileWriter.write(macAddress + "\n");
+                        fileWriter.write(String.format("%s%n",macAddress));
                         fileWriter.flush();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -94,7 +95,9 @@ public class Main {
                     e.printStackTrace();
                 }
                 //System.out.println("---" + macAddress + "---");
-            }, 0, 3, TimeUnit.MINUTES);
+            }, 0, 3, TimeUnit.SECONDS);
+
+
 
 //            client3.disconnect();
 
